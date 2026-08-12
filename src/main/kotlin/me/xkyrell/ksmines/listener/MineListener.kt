@@ -31,8 +31,9 @@ class MineListener(
 
         val block = event.block
         val mine = mineService.getResolver().getActiveMines()
-            .firstOrNull { it.getTemplate().getRegionOrThrow().contains(block.location) }
-            ?: return
+            .firstOrNull {
+                it.getTemplate().region?.contains(block.location) ?: false
+            } ?: return
 
         val mineBlock = mine.getCurrentStage().blocks
             .firstOrNull { it.getMaterial() == block.type }
