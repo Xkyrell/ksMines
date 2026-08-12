@@ -5,6 +5,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.0.0"
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.serialization") version "2.2.21"
+    kotlin("plugin.lombok") version "2.2.21"
     kotlin("kapt") version "2.2.21"
 }
 
@@ -60,5 +61,4 @@ bukkit {
     main = "me.xkyrell.ksmines.MinesPlugin"
     apiVersion = "1.21"
     softDepend = listOf("PlaceholderAPI")
-    libraries = listOf("")
 }
