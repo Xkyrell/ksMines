@@ -14,8 +14,9 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.server.PluginDisableEvent
 import org.bukkit.event.server.PluginEnableEvent
 import org.bukkit.plugin.Plugin
+import javax.inject.Inject
 
-class MineListener(
+class MineListener @Inject constructor(
     private val sessionService: MineSessionService,
     private val mineService: MineService,
     private val loader: MinesConfigLoader,
@@ -48,10 +49,14 @@ class MineListener(
     fun onEnablePlugin(event: PluginEnableEvent) {
         if (plugin != event.plugin) return
 
-        loader.getLoadedTemplates().forEach { (name, template) ->
-            val namespace = template.region?.minPoint?.world?.name ?: "undefined"
-            mineService.register(MineImpl(Key.key(namespace, name), template))
-        }
+        loader.getLoadedTemplates()
+            .mapNotNull { (name, template) ->
+                val region = template.region ?: return@mapNotNull null
+                val namespace = region.minPoint.world.name
+                MineImpl(Key.key(namespace, name), template)
+            }
+            .forEach(mineService::register)
+
         hook.register()
     }
 
@@ -59,7 +64,7 @@ class MineListener(
     fun onDisablePlugin(event: PluginDisableEvent) {
         if (plugin == event.plugin) {
             sessionService.unregisterAll()
-            mineService.unregisterAll()
+            mineService.unregisterAll(true)
             hook.unregister()
         }
     }
