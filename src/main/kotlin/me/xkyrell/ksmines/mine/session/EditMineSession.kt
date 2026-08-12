@@ -15,17 +15,14 @@ internal class EditMineSession(
     editorItem: ItemStack,
     private val editedStage: Int,
 ) : AbstractMineSession(
-    owner, target.getTemplate(), editorItem, editedStage,
-    target.getTemplate().region, target.getTemplate().refillLocation
+    key, owner, target.key(), target.getTemplate(),
+    editorItem, editedStage, target.getTemplate().region,
+    target.getTemplate().refillLocation
 ) {
 
     override fun createMine(template: MineTemplate): Mine {
         return MineImpl(target.key(), template)
     }
-
-    override fun getKey(): NamespacedKey = key
-
-    override fun getTargetIdentity(): Key = target.key()
 
     override fun getTarget(): Mine = target
 

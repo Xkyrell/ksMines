@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin
 import javax.inject.Inject
 
 class MainCommand @Inject constructor(
-    subCommands: Set<SubCommand>
+    subCommands: @JvmSuppressWildcards Set<SubCommand>
 ) {
 
     private val subCommands = subCommands

@@ -2,11 +2,11 @@ package me.xkyrell.ksmines.command.subcommand
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.IntegerArgumentType
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import me.xkyrell.ksmines.MinesConstants
 import me.xkyrell.ksmines.command.provider.MineSuggestionProvider
 import me.xkyrell.ksmines.config.CommonConfigLoader
@@ -17,6 +17,7 @@ import me.xkyrell.ksmines.mine.service.MineService
 import me.xkyrell.ksmines.mine.service.MineSessionService
 import me.xkyrell.ksmines.mine.session.MineSessionFactory
 import me.xkyrell.ksmines.mine.session.MineSessionResult
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.entity.Player
 import javax.inject.Inject
@@ -33,7 +34,7 @@ class SessionSubCommand @Inject constructor(
         return Commands.literal("session")
             .requires { it.sender is Player }
             .then(Commands.literal("start")
-                .then(Commands.argument("key", StringArgumentType.word())
+                .then(Commands.argument("key", ArgumentTypes.key())
                     .suggests(MineSuggestionProvider(mineService.getResolver()))
                     .then(Commands.argument("stage", IntegerArgumentType.integer(1))
                         .executes(::handleStartSession)
@@ -47,7 +48,7 @@ class SessionSubCommand @Inject constructor(
     }
 
     private fun handleStartSession(ctx: CommandContext<CommandSourceStack>): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = commonConfigLoader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(
@@ -57,7 +58,7 @@ class SessionSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        val key = StringArgumentType.getString(ctx, "key")
+        val key = ctx.getArgument("key", Key::class.java)
         val stage = IntegerArgumentType.getInteger(ctx, "stage")
         if (sessionService.getResolver().resolveSession(player) != null) {
             player.sendMessage(language.session.alreadyInSession.asComponent(
@@ -71,7 +72,7 @@ class SessionSubCommand @Inject constructor(
         if (mine == null) {
             player.sendMessage(language.session.alreadyInSession.asComponent(
                 Placeholder.component("prefix", language.prefix),
-                Placeholder.unparsed("mine", key)
+                Placeholder.unparsed("mine", key.asString())
             ))
 
             return Command.SINGLE_SUCCESS
@@ -97,7 +98,7 @@ class SessionSubCommand @Inject constructor(
     }
 
     private fun handleTeminateSession(ctx: CommandContext<CommandSourceStack>): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = commonConfigLoader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(

@@ -17,15 +17,6 @@ class ItemStackSerializer : KSerializer<ItemStack> {
             PrimitiveKind.STRING
         )
 
-    override fun serialize(
-        encoder: Encoder,
-        value: ItemStack
-    ) {
-        encoder.encodeString(
-            Base64.getEncoder().encodeToString(value.serializeAsBytes())
-        )
-    }
-
     override fun deserialize(
         decoder: Decoder
     ): ItemStack {
@@ -49,5 +40,14 @@ class ItemStackSerializer : KSerializer<ItemStack> {
                 "Failed to deserialize ItemStack", exception
             )
         }
+    }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: ItemStack
+    ) {
+        encoder.encodeString(
+            Base64.getEncoder().encodeToString(value.serializeAsBytes())
+        )
     }
 }

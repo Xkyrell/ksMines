@@ -13,7 +13,7 @@ enum class MineRotationStrategy {
 
     SEQUENTIAL {
         override fun next(items: List<MineStage>, index: Int): MineStage {
-            return items[index % items.size]
+            return items[(index + 1) % items.size]
         }
     };
 

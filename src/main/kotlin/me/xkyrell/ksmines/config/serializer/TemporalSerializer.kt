@@ -12,15 +12,6 @@ class TemporalSerializer : KSerializer<Temporal> {
 
     override val descriptor = PrimitiveSerialDescriptor("temporal", PrimitiveKind.STRING)
 
-    override fun serialize(
-        encoder: Encoder,
-        value: Temporal
-    ) {
-        encoder.encodeString(
-            value.formatAs(TemporalStyles.DEFAULT_STYLE)
-        )
-    }
-
     override fun deserialize(
         decoder: Decoder
     ): Temporal {
@@ -41,4 +32,20 @@ class TemporalSerializer : KSerializer<Temporal> {
             )
         }
     }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: Temporal
+    ) {
+        val format = value.formatAs(TemporalStyles.DEFAULT_STYLE)
+        encoder.encodeString(normalize(format))
+    }
+
+    // Temporary workaround
+    private fun normalize(value: String): String =
+        Regex("(\\d+)\\s*([A-Za-z]+)")
+            .findAll(value)
+            .joinToString(" ") {
+                "${it.groupValues[1]}${it.groupValues[2]}"
+            }
 }

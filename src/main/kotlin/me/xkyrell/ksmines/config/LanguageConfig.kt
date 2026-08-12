@@ -1,7 +1,8 @@
 package me.xkyrell.ksmines.config
 
 import kotlinx.serialization.Serializable
-import me.xkyrell.ksmines.config.section.LocaleSection
+import kotlinx.serialization.Contextual
+import me.xkyrell.ksmines.util.locale.LocaleComponent
 import me.xkyrell.ksmines.util.TemporalStyles
 import me.xkyrell.temporal.TemporalUnit
 import me.xkyrell.temporal.format.registry.TemporalEntry
@@ -10,45 +11,48 @@ import me.xkyrell.temporal.format.style.TextualTemporalStyle
 
 @Serializable
 data class LanguageConfig(
-    val prefix: LocaleSection = LocaleSection(
-        "<#A7F432>ksMines >"
+    @Contextual val prefix: LocaleComponent = LocaleComponent(
+        "<#A7F432><bold>ksMines ><bold/> "
     ),
-    val onlyPlayer: LocaleSection = LocaleSection(
-        "<prefix><red>Эта команда доступна только игроку."
-    ),
-    val noPermission: LocaleSection = LocaleSection(
+    @Contextual val noPermission: LocaleComponent = LocaleComponent(
         "<prefix><red>У вас недостаточно прав."
     ),
-    val mineNotFound: LocaleSection = LocaleSection(
-        "<prefix><red>Шахта <white><mine></white> не найдена."
-    ),
-    val mineAlreadyExists: LocaleSection = LocaleSection(
-        "<prefix><red>Шахта <white><mine></white> уже существует."
-    ),
-    val mineInactive: LocaleSection = LocaleSection(
-        "<prefix><red>Шахта <white><mine></white> сейчас неактивна."
-    ),
-    val templateNotFound: LocaleSection = LocaleSection(
-        "<prefix><red>Шаблон <white><template></white> не найден."
-    ),
-    val reload: LocaleSection = LocaleSection(
+    @Contextual val reload: LocaleComponent = LocaleComponent(
         "<prefix><green>Конфигурация успешно перезагружена."
     ),
-    val mineCreated: LocaleSection = LocaleSection(
+    @Contextual val templateNotFound: LocaleComponent = LocaleComponent(
+        "<prefix><red>Шаблон шахты <white><template></white> не найден."
+    ),
+    @Contextual val mineNotFound: LocaleComponent = LocaleComponent(
+        "<prefix><red>Шахта <white><mine></white> не найдена."
+    ),
+    @Contextual val mineAlreadyExists: LocaleComponent = LocaleComponent(
+        "<prefix><red>Шахта <white><mine></white> уже существует."
+    ),
+    @Contextual val mineInactive: LocaleComponent = LocaleComponent(
+        "<prefix><red>Шахта <white><mine></white> сейчас неактивна."
+    ),
+    @Contextual val mineCreated: LocaleComponent = LocaleComponent(
         "<prefix><green>Шахта <white><mine></white> успешно создана."
     ),
-    val mineRemoved: LocaleSection = LocaleSection(
+    @Contextual val mineRemoved: LocaleComponent = LocaleComponent(
         "<prefix><green>Шахта <white><mine></white> успешно удалена."
     ),
-    val mineRefilled: LocaleSection = LocaleSection(
+    @Contextual val mineRefilled: LocaleComponent = LocaleComponent(
         "<prefix><green>Шахта <white><mine></white> успешно перезаполнена, благодаря <player>."
     ),
-    val mineRotated: LocaleSection = LocaleSection(
+    @Contextual val mineRotated: LocaleComponent = LocaleComponent(
         "<prefix><green>Шахта <white><mine></white> переключена на следующий этап, благодаря <player>."
+    ),
+    @Contextual val mineTeleported: LocaleComponent = LocaleComponent(
+        "<prefix><green>Вы телепортированы на шахту <white><mine></white>."
+    ),
+    @Contextual val mineRegionMissing: LocaleComponent = LocaleComponent(
+        "<prefix><red>У шахты <white><mine></white> не задан регион."
     ),
     val mineList: MineListSection = MineListSection(),
     val session: SessionSection = SessionSection(),
-    val timeFormat: TemporalRegistrySection,
+    val timeFormat: TemporalRegistrySection = TemporalRegistrySection(),
     val help: HelpSection = HelpSection()
 ) {
 
@@ -59,95 +63,108 @@ data class LanguageConfig(
 
 @Serializable
 data class MineListSection(
-    val layout: List<LocaleSection> = listOf(
-        LocaleSection(""),
-        LocaleSection("<gradient:#FFD700:#B87333><bold>Доступные шахты</bold></gradient>"),
-        LocaleSection(""),
-        LocaleSection("<mine-entry>"),
-        LocaleSection("")
+    val layout: List<@Contextual LocaleComponent> = listOf(
+        LocaleComponent(""),
+        LocaleComponent("<gradient:#FFD700:#B87333><bold>Доступные шахты</bold></gradient>"),
+        LocaleComponent(""),
+        LocaleComponent("<mine-entry>"),
+        LocaleComponent("")
     ),
-    val entry: LocaleSection = LocaleSection(
-        "<hover:show_text:'<gray>Нажмите, чтобы телепортироваться'>"
-                + "<click:run_command:'/mine teleport <mine>'>"
-                + "<dark_gray>* "
-                + "<#A7F432><mine></#A7F432> "
-                + "<gray>(<mine_is_active>) "
-                + "<green>[<location>]"
-                + "</click>"
+    @Contextual
+    val entry: LocaleComponent = LocaleComponent(
+        "<dark_gray>* <#A7F432><mine></#A7F432> (<mine_is_active>) <green>[<location>]"
     ),
-    val empty: LocaleSection = LocaleSection(
-        "<prefix><red>На данный момент не существует ни одной шахты."
+    @Contextual val empty: LocaleComponent = LocaleComponent(
+        "<red>На данный момент не существует ни одной шахты."
     ),
-    val active: LocaleSection = LocaleSection(
+    @Contextual val active: LocaleComponent = LocaleComponent(
         "<green>Активна"
     ),
-    val inactive: LocaleSection = LocaleSection(
+    @Contextual val inactive: LocaleComponent = LocaleComponent(
         "<red>Неактивна"
     )
 )
 
 @Serializable
 data class SessionSection(
-    val started: LocaleSection = LocaleSection(
+    @Contextual val started: LocaleComponent = LocaleComponent(
         "<prefix><green>Сессия шахты успешно начата."
     ),
-    val alreadyInSession: LocaleSection = LocaleSection(
+    @Contextual val alreadyInSession: LocaleComponent = LocaleComponent(
         "<prefix><yellow>Вы уже находитесь в сессии шахты."
     ),
-    val noActiveSession: LocaleSection = LocaleSection(
+    @Contextual val noActiveSession: LocaleComponent = LocaleComponent(
         "<prefix><red>У вас нет активной сессии шахты."
     ),
-    val terminated: LocaleSection = LocaleSection(
+    @Contextual val terminated: LocaleComponent = LocaleComponent(
         "<prefix><yellow>Сессия шахты завершена."
     ),
-    val regionMinPointSet: LocaleSection = LocaleSection(
+    @Contextual val invalidStage: LocaleComponent = LocaleComponent(
+        "<prefix><red>Этап <white><stage></white> не существует у данного шаблона."
+    ),
+    @Contextual val regionMinPointSet: LocaleComponent = LocaleComponent(
         "<prefix><green>Минимальная точка региона установлена: <white><location></white>"
     ),
-    val regionMaxPointSet: LocaleSection = LocaleSection(
+    @Contextual val regionMaxPointSet: LocaleComponent = LocaleComponent(
         "<prefix><green>Максимальная точка региона установлена: <white><location></white>"
     ),
-    val blockAdded: LocaleSection = LocaleSection(
+    @Contextual val blockAdded: LocaleComponent = LocaleComponent(
         "<prefix><green>Блок <white><material></white> добавлен в шахту."
     ),
-    val blockNotFound: LocaleSection = LocaleSection(
-        "<prefix><red>Блок <white><material></white> не найден."
+    @Contextual val blockNotFound: LocaleComponent = LocaleComponent(
+        "<prefix><red>Блок <white><material></white> не найден в шахте."
     ),
-    val blockRemoved: LocaleSection = LocaleSection(
+    @Contextual val blockRemoved: LocaleComponent = LocaleComponent(
         "<prefix><green>Блок <white><material></white> удалён из шахты."
     ),
-    val dropAdded: LocaleSection = LocaleSection(
+    @Contextual val dropAdded: LocaleComponent = LocaleComponent(
         "<prefix><green>Дроп для блока <white><material></white> успешно добавлен."
     ),
-    val invalidProbability: LocaleSection = LocaleSection(
+    @Contextual val dropNotFound: LocaleComponent = LocaleComponent(
+        "<prefix><green>Дроп для блока <white><material></white> не найдет."
+    ),
+    @Contextual val dropRemoved: LocaleComponent = LocaleComponent(
+        "<prefix><green>Дроп <white><material></white> удалён."
+    ),
+    @Contextual val invalidBlock: LocaleComponent = LocaleComponent(
+        "<prefix><red>Данный материал не может быть использован в  шахте."
+    ),
+    @Contextual val invalidProbability: LocaleComponent = LocaleComponent(
         "<prefix><red>Вероятность должна находиться в диапазоне от <white>0.0</white> до <white>1.0</white>."
     ),
-    val blockInteractionDenied: LocaleSection = LocaleSection(
+    @Contextual val blockInteractionDenied: LocaleComponent = LocaleComponent(
         "<prefix><red>Взаимодействие с блоками во время сессии редактирования запрещено!"
     ),
-    val noChangesSession: LocaleSection = LocaleSection(
+    @Contextual val noItemInHand: LocaleComponent = LocaleComponent(
+        "<prefix><red>Возьмите предмет дропа в руку."
+    ),
+    @Contextual val noItemsInInventory: LocaleComponent = LocaleComponent(
+        "<prefix><red>В вашем инвентаре нет предметов, которые можно добавить как дроп."
+    ),
+    @Contextual val noChangesSession: LocaleComponent = LocaleComponent(
         "<prefix><yellow>Изменений в текущей сессии нет."
     ),
-    val appliedChangesSession: LocaleSection = LocaleSection(
+    @Contextual val appliedChangesSession: LocaleComponent = LocaleComponent(
         "<prefix><green>Изменения сессии успешно применены."
     )
 )
 
 @Serializable
 data class HelpSection(
-    val layout: List<LocaleSection> = listOf(
-        LocaleSection(""),
-        LocaleSection("<green>/ksmines help <dark_gray>- <white>справка по командам"),
-        LocaleSection("<green>/ksmines reload <dark_gray>- <white>перезагрузить конфигурацию"),
-        LocaleSection("<green>/ksmines list <dark_gray>- <white>список шахт"),
-        LocaleSection("<green>/ksmines refill <key> <dark_gray>- <white>перезаполнить шахту"),
-        LocaleSection("<green>/ksmines rotate <key> <dark_gray>- <white>переключить этап шахты"),
-        LocaleSection("<green>/ksmines remove <key> <dark_gray>- <white>удалить шахту"),
-        LocaleSection("<green>/ksmines create <key> <template> <dark_gray>- <white>создать шахту из шаблона"),
-        LocaleSection("<green>/ksmines session start <key> <stage> <dark_gray>- <white>начать редактирование шахты"),
-        LocaleSection("<green>/ksmines session terminate <dark_gray>- <white>применить и завершить сессию"),
-        LocaleSection("<green>/ksmines addblock <material> <probability> [--drop-by-hand/--drop-by-inventory <p>] <dark_gray>- <white>добавить блок"),
-        LocaleSection("<green>/ksmines adddrop <material> <probability> <dark_gray>- <white>добавить дроп для блока"),
-        LocaleSection("")
+    val layout: List<@Contextual LocaleComponent> = listOf(
+        LocaleComponent(""),
+        LocaleComponent("<green>/ksmines help <dark_gray>- <white>справка по командам"),
+        LocaleComponent("<green>/ksmines reload <dark_gray>- <white>перезагрузить конфигурацию"),
+        LocaleComponent("<green>/ksmines list <dark_gray>- <white>список шахт"),
+        LocaleComponent("<green>/ksmines refill <key> <dark_gray>- <white>перезаполнить шахту"),
+        LocaleComponent("<green>/ksmines rotate <key> <dark_gray>- <white>переключить этап шахты"),
+        LocaleComponent("<green>/ksmines remove <key> <dark_gray>- <white>удалить шахту"),
+        LocaleComponent("<green>/ksmines create <key> <template> <dark_gray>- <white>создать шахту из шаблона"),
+        LocaleComponent("<green>/ksmines session start <key> <stage> <dark_gray>- <white>начать редактирование шахты"),
+        LocaleComponent("<green>/ksmines session terminate <dark_gray>- <white>применить и завершить сессию"),
+        LocaleComponent("<green>/ksmines addblock <material> <probability> [--drop-by-hand/--drop-by-inventory] <dark_gray>- <white>добавить блок"),
+        LocaleComponent("<green>/ksmines adddrop <material> <probability> <dark_gray>- <white>добавить дроп для блока"),
+        LocaleComponent("")
     )
 )
 

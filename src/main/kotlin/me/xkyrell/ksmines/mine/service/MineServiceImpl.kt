@@ -4,8 +4,9 @@ import me.xkyrell.ksmines.mine.Mine
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.KeyPattern
 import org.bukkit.Material
+import javax.inject.Inject
 
-class MineServiceImpl : MineService {
+class MineServiceImpl @Inject constructor() : MineService {
 
     private val mines = HashMap<Key, Mine>()
 

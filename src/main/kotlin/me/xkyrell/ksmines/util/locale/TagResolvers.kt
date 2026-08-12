@@ -7,8 +7,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.TagPattern
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
-
-class TagResolvers {
+object TagResolvers {
 
     fun components(
         @TagPattern key: String,

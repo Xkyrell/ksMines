@@ -9,8 +9,9 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
+import javax.inject.Inject
 
-class MineTask(
+class MineTask @Inject constructor (
     private val plugin: Plugin,
     private val loader: CommonConfigLoader,
     private val resolver: MineResolver

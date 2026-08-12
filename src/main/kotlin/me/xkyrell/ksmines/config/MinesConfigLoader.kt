@@ -5,6 +5,7 @@ import kotlinx.serialization.modules.SerializersModule
 import me.xkyrell.ksmines.config.serializer.*
 import me.xkyrell.ksmines.mine.MineTemplate
 import me.xkyrell.ksmines.mine.MineTemplates
+import me.xkyrell.ksmines.util.locale.LocaleComponent
 import me.xkyrell.temporal.Temporal
 import org.bukkit.Location
 import org.bukkit.Material
@@ -12,14 +13,16 @@ import org.bukkit.Sound
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Files
 import java.nio.file.Path
+import javax.inject.Inject
 
-class MinesConfigLoader(
+class MinesConfigLoader @Inject constructor(
     dataFolder: Path
 ) : AbstractConfigLoader(dataFolder) {
 
     override val yaml: Yaml = Yaml(
         serializersModule = SerializersModule {
             contextual(Material::class, MaterialSerializer())
+            contextual(LocaleComponent::class, LocaleComponentSerializer())
             contextual(Sound::class, SoundSerializer())
             contextual(ItemStack::class, ItemStackSerializer())
             contextual(Location::class, LocationSerializer())
@@ -27,7 +30,7 @@ class MinesConfigLoader(
         }
     )
 
-    private val minesDirectory: Path = dataFolder.resolve("mines")
+    private val minesDirectory: Path = dataFolder.resolve("templates")
 
     private val templates: MutableMap<String, MineTemplate> = HashMap()
 
@@ -36,7 +39,7 @@ class MinesConfigLoader(
             Files.createDirectories(minesDirectory)
             loadAll()
             if (templates.isEmpty()) {
-                createDefaults()
+                saveTemplate("normal", MineTemplates.DEFAULTS)
             }
         }
         catch (ex: Exception) {
@@ -52,7 +55,7 @@ class MinesConfigLoader(
             templates.clear()
             loadAll()
             if (templates.isEmpty()) {
-                createDefaults()
+                saveTemplate("normal", MineTemplates.DEFAULTS)
             }
         }
         catch (ex: Exception) {
@@ -102,10 +105,6 @@ class MinesConfigLoader(
         }
 
         return name
-    }
-
-    private fun createDefaults() {
-        saveTemplate("normal", MineTemplates.DEFAULTS)
     }
 
     fun saveTemplate(

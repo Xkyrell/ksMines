@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 @Serializable
 data class MineBlockDrop(
     @Contextual val item: ItemStack,
-    val probability: Double = 1.0
+    private val probability: Double = 1.0
 ) : Weighted {
 
     init {
@@ -17,6 +17,6 @@ data class MineBlockDrop(
         }
     }
 
-    override fun getProbability(): Double = probability;
+    override fun getProbability(): Double = probability
 
 }

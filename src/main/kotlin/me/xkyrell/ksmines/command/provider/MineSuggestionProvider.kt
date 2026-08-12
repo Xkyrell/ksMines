@@ -18,7 +18,7 @@ class MineSuggestionProvider(
     ): CompletableFuture<Suggestions> {
         val remaining = builder.remainingLowerCase
         resolver.getMines()
-            .map { it.key().value() }
+            .map { it.key().asString() }
             .filter { it.lowercase().startsWith(remaining) }
             .forEach(builder::suggest)
 

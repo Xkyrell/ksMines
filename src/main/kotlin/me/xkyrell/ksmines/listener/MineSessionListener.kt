@@ -1,45 +1,66 @@
 package me.xkyrell.ksmines.listener
 
 import me.xkyrell.ksmines.config.CommonConfigLoader
+import me.xkyrell.ksmines.config.LanguageConfig
 import me.xkyrell.ksmines.mine.service.MineSessionResolver
 import me.xkyrell.ksmines.mine.session.MineSession
+import me.xkyrell.ksmines.util.formatted
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerInteractEvent
+import javax.inject.Inject
 
-class MineSessionListener(
+class MineSessionListener @Inject constructor(
     private val resolver: MineSessionResolver,
     private val loader: CommonConfigLoader
 ) : Listener {
 
     @EventHandler
-    fun onBlockBreak(event: BlockBreakEvent) {
-        if (handleBlockInteraction(event.player) {
-            it.modifyMinPoint(event.block.location)
-        }) {
-            event.isCancelled = true
+    fun onPlayerInteract(event: PlayerInteractEvent) {
+        val action = event.action
+        if (action != Action.LEFT_CLICK_BLOCK && action != Action.RIGHT_CLICK_BLOCK) {
+            return
         }
-    }
 
-    @EventHandler
-    fun onBlockPlace(event: BlockPlaceEvent) {
-        if (handleBlockInteraction(event.player) {
-            it.modifyMaxPoint(event.block.location)
-        }) {
-            event.isCancelled = true
+        val player = event.player
+        val language = loader.getLanguageConfig()
+        val clickedLocation = event.clickedBlock?.location ?: return
+        val interacted = handleBlockInteraction(player, language) { session ->
+            val isMinPoint = action == Action.LEFT_CLICK_BLOCK
+            val messageComponent = if (isMinPoint) {
+                language.session.regionMinPointSet
+            }
+            else {
+                language.session.regionMaxPointSet
+            }
+
+            player.sendMessage(
+                messageComponent.asComponent(
+                    Placeholder.component("prefix", language.prefix),
+                    Placeholder.unparsed("location", clickedLocation.formatted())
+                )
+            )
+
+            if (isMinPoint) {
+                session.modifyMinPoint(clickedLocation)
+            }
+            else {
+                session.modifyMaxPoint(clickedLocation)
+            }
         }
+
+        if (interacted) event.isCancelled = true
     }
 
     private fun handleBlockInteraction(
-        player: Player,
+        player: Player, language: LanguageConfig,
         action: (MineSession) -> Unit
     ): Boolean {
         val session = resolver.resolveSession(player) ?: return false
         if (!loader.getGeneralConfig().allowBlockInteractionInSession) {
-            val language = loader.getLanguageConfig()
             player.sendMessage(language.session.blockInteractionDenied.asComponent(
                 Placeholder.component("prefix", language.prefix)
             ))

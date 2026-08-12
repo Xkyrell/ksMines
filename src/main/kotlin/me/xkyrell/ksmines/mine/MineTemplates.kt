@@ -1,6 +1,6 @@
 package me.xkyrell.ksmines.mine
 
-import me.xkyrell.ksmines.config.section.LocaleSection
+import me.xkyrell.ksmines.util.locale.LocaleComponent
 import me.xkyrell.ksmines.config.section.SoundSection
 import me.xkyrell.ksmines.mine.block.MineBlockDrop
 import me.xkyrell.ksmines.mine.block.MineBlockImpl
@@ -21,10 +21,10 @@ import org.bukkit.inventory.ItemStack
             rotationStrategy = MineRotationStrategy.SEQUENTIAL,
             rotationStages = listOf(
                 MineStage(
-                    displayName = LocaleSection("<green>Этап 1"),
+                    displayName = LocaleComponent("<green>Этап 1"),
                     activationNotification = listOf(
-                        LocaleSection("<green>Этап авто-шахты повысился на 1."),
-                        LocaleSection("<green>Вперед к новый ресурсам! Локация: <white><location></white>.")
+                        LocaleComponent("<green>Этап авто-шахты повысился на 1."),
+                        LocaleComponent("<green>Вперед к новый ресурсам! Локация: <white><location></white>.")
                     ),
                     activationSound = SoundSection(
                         sound = Sound.BLOCK_NOTE_BLOCK_PLING,
@@ -32,8 +32,8 @@ import org.bukkit.inventory.ItemStack
                         pitch = 0.8f
                     ),
                     refillNotification = listOf(
-                        LocaleSection("<yellow>Авто-шахта 1 этапа перезаполнилась."),
-                        LocaleSection("<yellow>Локация: <red><location></red>. Тсс.......")
+                        LocaleComponent("<yellow>Авто-шахта 1 этапа перезаполнилась."),
+                        LocaleComponent("<yellow>Локация: <red><location></red>. Тсс.......")
                     ),
                     refillSound = SoundSection(
                         sound = Sound.BLOCK_AMETHYST_BLOCK_CHIME
@@ -80,17 +80,17 @@ import org.bukkit.inventory.ItemStack
                     )
                 ),
                 MineStage(
-                    displayName = LocaleSection("<gold>Этап 2"),
+                    displayName = LocaleComponent("<gold>Этап 2"),
                     activationNotification = listOf(
-                        LocaleSection("<green>Этап авто-шахты повысился на 2."),
-                        LocaleSection("<green>Ожидается нечто крутое! Локация: <gradient:#FF3B30:#8A2BE2><location></gradient>.")
+                        LocaleComponent("<green>Этап авто-шахты повысился на 2."),
+                        LocaleComponent("<green>Ожидается нечто крутое! Локация: <gradient:#FF3B30:#8A2BE2><location></gradient>.")
                     ),
                     activationSound = SoundSection(
                         sound = Sound.BLOCK_BEACON_ACTIVATE
                     ),
                     refillNotification = listOf(
-                        LocaleSection("<yellow>Авто-шахта 2 этапа перезаполнилась."),
-                        LocaleSection("<yellow>Локация: <gradient:#FFD700:#B87333><location></gradient>.")
+                        LocaleComponent("<yellow>Авто-шахта 2 этапа перезаполнилась."),
+                        LocaleComponent("<yellow>Локация: <gradient:#FFD700:#B87333><location></gradient>.")
                     ),
                     refillSound = SoundSection(
                         sound = Sound.BLOCK_BEACON_POWER_SELECT,

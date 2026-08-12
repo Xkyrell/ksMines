@@ -1,6 +1,5 @@
 package me.xkyrell.ksmines.util.locale
 
-import me.xkyrell.ksmines.config.section.LocaleSection
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import org.bukkit.Server
@@ -8,14 +7,14 @@ import org.bukkit.Server
 fun interface LocaleBiListRenderer<A, B> {
 
     fun render(
-        locales: List<LocaleSection>,
+        locales: List<LocaleComponent>,
         first: A,
         second: B
     ): List<Component>
 
     fun sendMessage(
         audience: Audience,
-        locale: List<LocaleSection>,
+        locale: List<LocaleComponent>,
         first: A,
         second: B
     ) {
@@ -24,7 +23,7 @@ fun interface LocaleBiListRenderer<A, B> {
 
     fun sendMessageForAll(
         server: Server,
-        locales: List<LocaleSection>,
+        locales: List<LocaleComponent>,
         first: A,
         second: B
     ) {

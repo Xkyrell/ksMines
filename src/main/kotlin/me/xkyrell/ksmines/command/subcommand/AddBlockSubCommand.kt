@@ -66,7 +66,7 @@ class AddBlockSubCommand @Inject constructor(
     private fun handleAddBlock(
         ctx: CommandContext<CommandSourceStack>, drops: (Player, MineSession) -> Set<MineBlockDrop>?
     ): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = loader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(

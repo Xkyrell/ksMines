@@ -34,6 +34,6 @@ abstract class KeyedSerializer<T : Keyed>(
         encoder: Encoder,
         value: T
     ) {
-        encoder.encodeString(value.key().asMinimalString())
+        encoder.encodeString(value.key.asMinimalString())
     }
 }

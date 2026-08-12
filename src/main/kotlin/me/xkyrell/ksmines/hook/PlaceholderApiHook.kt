@@ -6,8 +6,9 @@ import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.mine.service.MineResolver
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
+import javax.inject.Inject
 
-class PlaceholderApiHook(
+class PlaceholderApiHook @Inject constructor(
     private val resolver: MineResolver,
     private val loader: CommonConfigLoader,
     private val plugin: Plugin

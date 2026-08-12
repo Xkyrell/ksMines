@@ -31,7 +31,7 @@ class RemoveDropSubCommand @Inject constructor(
     }
 
     private fun handleRemoveDrop(ctx: CommandContext<CommandSourceStack>): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = loader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(

@@ -6,18 +6,20 @@ import io.papermc.paper.datacomponent.item.ItemLore
 import io.papermc.paper.datacomponent.item.ResolvableProfile
 import io.papermc.paper.datacomponent.item.TooltipDisplay
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Contextual
+import me.xkyrell.ksmines.util.locale.LocaleComponent
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 @Serializable
 data class ItemSection(
-    var displayName: LocaleSection? = null,
-    var lore: List<LocaleSection>? = null,
-    var material: Material? = null,
+    @Contextual var displayName: LocaleComponent? = null,
+    var lore: List<@Contextual LocaleComponent>? = null,
+    @Contextual var material: Material? = null,
     var texture: String? = null,
     var hideAttributes: Boolean = false,
     var glowing: Boolean = false,
-    var amount: Int? = null
+    var amount: Int? = 1
 ) {
 
     @Suppress("UnstableApiUsage")

@@ -2,16 +2,17 @@ package me.xkyrell.ksmines.command.subcommand
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.BoolArgumentType
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import me.xkyrell.ksmines.MinesConstants
 import me.xkyrell.ksmines.command.provider.MineSuggestionProvider
 import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.config.MinesConfigLoader
 import me.xkyrell.ksmines.mine.service.MineService
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.entity.Player
 import javax.inject.Inject
@@ -25,7 +26,7 @@ class RemoveSubCommand @Inject constructor(
     override fun build(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("remove")
             .requires { it.sender is Player }
-            .then(Commands.argument("key", StringArgumentType.word())
+            .then(Commands.argument("key", ArgumentTypes.key())
                 .suggests(MineSuggestionProvider(mineService.getResolver()))
                 .executes {
                     handleRemove(it, false)
@@ -50,12 +51,12 @@ class RemoveSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        val key = ctx.getArgument("key", String::class.java)
+        val key = ctx.getArgument("key", Key::class.java)
         val mine = mineService.getResolver().resolve(key)
         if (mine == null) {
             sender.sendMessage(language.mineNotFound.asComponent(
                 Placeholder.component("prefix", language.prefix),
-                Placeholder.unparsed("mine", key)
+                Placeholder.unparsed("mine", key.asString())
             ))
 
             return Command.SINGLE_SUCCESS

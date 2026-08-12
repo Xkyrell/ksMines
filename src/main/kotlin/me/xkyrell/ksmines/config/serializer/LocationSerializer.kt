@@ -19,24 +19,6 @@ class LocationSerializer : KSerializer<Location> {
         element<Float>("pitch")
     }
 
-    override fun serialize(
-        encoder: Encoder,
-        value: Location
-    ) {
-        encoder.encodeStructure(descriptor) {
-            encodeStringElement(
-                descriptor,
-                0,
-                requireNotNull(value.world).name
-            )
-            encodeDoubleElement(descriptor, 1, value.x)
-            encodeDoubleElement(descriptor, 2, value.y)
-            encodeDoubleElement(descriptor, 3, value.z)
-            encodeFloatElement(descriptor, 4, value.yaw)
-            encodeFloatElement(descriptor, 5, value.pitch)
-        }
-    }
-
     override fun deserialize(
         decoder: Decoder
     ): Location {
@@ -80,5 +62,23 @@ class LocationSerializer : KSerializer<Location> {
             yaw,
             pitch
         )
+    }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: Location
+    ) {
+        encoder.encodeStructure(descriptor) {
+            encodeStringElement(
+                descriptor,
+                0,
+                requireNotNull(value.world).name
+            )
+            encodeDoubleElement(descriptor, 1, value.x)
+            encodeDoubleElement(descriptor, 2, value.y)
+            encodeDoubleElement(descriptor, 3, value.z)
+            encodeFloatElement(descriptor, 4, value.yaw)
+            encodeFloatElement(descriptor, 5, value.pitch)
+        }
     }
 }

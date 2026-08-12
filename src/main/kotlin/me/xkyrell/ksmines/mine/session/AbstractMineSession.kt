@@ -4,13 +4,17 @@ import me.xkyrell.ksmines.mine.Mine
 import me.xkyrell.ksmines.mine.MineTemplate
 import me.xkyrell.ksmines.mine.block.MineBlock
 import me.xkyrell.ksmines.util.*
+import net.kyori.adventure.key.Key
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
 internal abstract class AbstractMineSession(
+    private val key: NamespacedKey,
     private val owner: Player,
+    private val targetIdentity: Key,
     private val template: MineTemplate,
     private val editorItem: ItemStack,
     private val editedStage: Int,
@@ -24,12 +28,15 @@ internal abstract class AbstractMineSession(
                 "Invalid mine stage index: $editedStage"
             )
     )
+
+    private var minPoint: Location? = region?.minPoint?.clone()
+    private var maxPoint: Location? = region?.maxPoint?.clone()
+
     private val inventorySnapshot = PlayerInventorySnapshot.capture(owner)
     private var closed = false
 
     private val sessionIdentity: String get() {
-        val identity = getTargetIdentity()
-        return "${identity.namespace()}-${identity.value()}"
+        return "${targetIdentity.namespace()}-${targetIdentity.value()}"
     }
 
     init {
@@ -53,8 +60,7 @@ internal abstract class AbstractMineSession(
             "session is already closed"
         }
 
-        region = region?.let { Cuboid(location, it.maxPoint) }
-            ?: Cuboid(location, location)
+        minPoint = location.clone()
     }
 
     override fun modifyMaxPoint(location: Location) {
@@ -62,8 +68,7 @@ internal abstract class AbstractMineSession(
             "session is already closed"
         }
 
-        region = region?.let { Cuboid(it.minPoint, location) }
-            ?: Cuboid(location, location)
+        maxPoint = location.clone()
     }
 
     override fun setRefillLocation(location: Location?) {
@@ -112,9 +117,13 @@ internal abstract class AbstractMineSession(
         modifiedBlocks.addAll(modified)
     }
 
+    override fun getKey(): NamespacedKey = key
+
     override fun getOwner(): Player = owner
 
     override fun getEditedStage(): Int = editedStage
+
+    override fun getTargetIdentity(): Key = targetIdentity
 
     override fun getModifiedBlocks(): Set<MineBlock> {
         return modifiedBlocks.toSet()
@@ -154,9 +163,20 @@ internal abstract class AbstractMineSession(
 
         return template.copy(
             rotationStages = stages,
-            region = region,
+            region = createRegion(),
             refillLocation = refillLocation
         )
+    }
+
+    private fun createRegion(): Cuboid? {
+        val minPoint = minPoint ?: return region
+        val maxPoint = maxPoint ?: return region
+
+        if (minPoint == region?.minPoint && maxPoint == region?.maxPoint) {
+            return region
+        }
+
+        return Cuboid.of(minPoint, maxPoint)
     }
 
     override fun close() {

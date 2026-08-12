@@ -1,16 +1,17 @@
 package me.xkyrell.ksmines.command.subcommand
 
 import com.mojang.brigadier.Command
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import me.xkyrell.ksmines.MinesConstants
 import me.xkyrell.ksmines.command.provider.MineSuggestionProvider
 import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.mine.service.MineResolver
 import me.xkyrell.ksmines.util.Cuboid
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -25,7 +26,7 @@ class TeleportSubCommand @Inject constructor(
         return Commands.literal("teleport")
             .requires { it.sender is Player }
             .then(
-                Commands.argument("key", StringArgumentType.word())
+                Commands.argument("key", ArgumentTypes.key())
                 .suggests(MineSuggestionProvider(mineResolver))
                 .executes(::handleTeleport)
             )
@@ -33,7 +34,7 @@ class TeleportSubCommand @Inject constructor(
     }
 
     private fun handleTeleport(ctx: CommandContext<CommandSourceStack>): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = commonConfigLoader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(
@@ -43,12 +44,12 @@ class TeleportSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        val key = ctx.getArgument("key", String::class.java)
+        val key = ctx.getArgument("key", Key::class.java)
         val mine = mineResolver.resolve(key)
         if (mine == null) {
             player.sendMessage(language.mineNotFound.asComponent(
                 Placeholder.component("prefix", language.prefix),
-                Placeholder.unparsed("mine", key)
+                Placeholder.unparsed("mine", key.asString())
             ))
 
             return Command.SINGLE_SUCCESS
@@ -58,7 +59,7 @@ class TeleportSubCommand @Inject constructor(
         if (region == null) {
             player.sendMessage(language.mineRegionMissing.asComponent(
                 Placeholder.component("prefix", language.prefix),
-                Placeholder.unparsed("mine", key)
+                Placeholder.unparsed("mine", key.asString())
             ))
 
             return Command.SINGLE_SUCCESS
@@ -67,7 +68,7 @@ class TeleportSubCommand @Inject constructor(
         player.teleport(getTeleportLocation(region))
         player.sendMessage(language.mineTeleported.asComponent(
             Placeholder.component("prefix", language.prefix),
-            Placeholder.unparsed("mine", key)
+            Placeholder.unparsed("mine", key.asString())
         ))
 
         return Command.SINGLE_SUCCESS

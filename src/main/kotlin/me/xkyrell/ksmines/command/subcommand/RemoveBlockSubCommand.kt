@@ -29,7 +29,7 @@ class RemoveBlockSubCommand @Inject constructor(
     }
 
     private fun handleBlock(ctx: CommandContext<CommandSourceStack>): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = loader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(

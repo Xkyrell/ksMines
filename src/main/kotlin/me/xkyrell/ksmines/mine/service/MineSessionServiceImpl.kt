@@ -4,8 +4,9 @@ import me.xkyrell.ksmines.mine.Mine
 import me.xkyrell.ksmines.mine.session.MineSession
 import org.bukkit.entity.Player
 import java.util.UUID
+import javax.inject.Inject
 
-class MineSessionServiceImpl : MineSessionService {
+class MineSessionServiceImpl @Inject constructor() : MineSessionService {
 
     private val sessions = HashMap<UUID, MineSession>()
 

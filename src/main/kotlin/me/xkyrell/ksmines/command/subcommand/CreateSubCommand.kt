@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import me.xkyrell.ksmines.MinesConstants
 import me.xkyrell.ksmines.command.provider.TemplateSuggestionProvider
 import me.xkyrell.ksmines.config.CommonConfigLoader
@@ -31,7 +32,7 @@ class CreateSubCommand @Inject constructor(
     override fun build(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("create")
             .requires { it.sender is Player }
-            .then(Commands.argument("key", StringArgumentType.word())
+            .then(Commands.argument("key", ArgumentTypes.key())
                 .then(Commands.argument("template", StringArgumentType.word())
                     .suggests(TemplateSuggestionProvider(minesConfigLoader))
                     .executes(::handleMineCreation)
@@ -41,7 +42,7 @@ class CreateSubCommand @Inject constructor(
     }
 
     private fun handleMineCreation(ctx: CommandContext<CommandSourceStack>): Int {
-        val player = ctx.source as Player
+        val player = ctx.source.sender as Player
         val language = commonConfigLoader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
             player.sendMessage(language.noPermission.asComponent(
@@ -51,7 +52,7 @@ class CreateSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        val key = ctx.getArgument("key", String::class.java)
+        val key = ctx.getArgument("key", Key::class.java)
         if (sessionService.getResolver().resolveSession(player) != null) {
             player.sendMessage(language.session.alreadyInSession.asComponent(
                 Placeholder.component("prefix", language.prefix)
@@ -63,7 +64,7 @@ class CreateSubCommand @Inject constructor(
         if (mineResolver.resolve(key) != null) {
             player.sendMessage(language.mineAlreadyExists.asComponent(
                 Placeholder.component("prefix", language.prefix),
-                Placeholder.unparsed("mine", key)
+                Placeholder.unparsed("mine", key.asString())
             ))
 
             return Command.SINGLE_SUCCESS
@@ -80,7 +81,7 @@ class CreateSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        createMineSession(player, key, trustedTemplate, language);
+        createMineSession(player, key.asString(), trustedTemplate, language);
         return Command.SINGLE_SUCCESS
     }
 
