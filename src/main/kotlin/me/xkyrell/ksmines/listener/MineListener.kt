@@ -48,7 +48,8 @@ class MineListener(
         if (plugin != event.plugin) return
 
         loader.getLoadedTemplates().forEach { (name, template) ->
-            mineService.register(MineImpl(Key.key(plugin.name, name), template))
+            val namespace = template.region?.minPoint?.world?.name ?: "undefined"
+            mineService.register(MineImpl(Key.key(namespace, name), template))
         }
         hook.register()
     }
