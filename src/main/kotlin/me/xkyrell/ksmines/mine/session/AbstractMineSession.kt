@@ -116,6 +116,10 @@ internal abstract class AbstractMineSession(
 
     override fun getEditedStage(): Int = editedStage
 
+    override fun getModifiedBlocks(): Set<MineBlock> {
+        return modifiedBlocks.toSet()
+    }
+
     override fun isClosed(): Boolean = closed
 
     override fun isSessionItem(item: ItemStack): Boolean {

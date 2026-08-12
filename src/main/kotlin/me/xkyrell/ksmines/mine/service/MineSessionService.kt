@@ -9,6 +9,8 @@ interface MineSessionService {
 
     fun unregister(owner: Player) : Boolean
 
+    fun terminate(owner: Player) : MineSession?
+
     fun unregisterAll()
 
     fun getResolver() : MineSessionResolver

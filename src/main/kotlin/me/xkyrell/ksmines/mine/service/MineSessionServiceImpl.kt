@@ -25,6 +25,10 @@ class MineSessionServiceImpl : MineSessionService {
         return false
     }
 
+    override fun terminate(owner: Player): MineSession? {
+        return sessions.remove(owner.uniqueId)
+    }
+
     override fun unregisterAll() {
         val iterator = sessions.values.iterator()
         while (iterator.hasNext()) {
