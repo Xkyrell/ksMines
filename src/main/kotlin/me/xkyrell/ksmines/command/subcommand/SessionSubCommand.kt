@@ -42,7 +42,14 @@ class SessionSubCommand @Inject constructor(
                 )
             )
             .then(Commands.literal("terminate")
-                .executes(::handleTeminateSession)
+                .executes {
+                    handleTeminateSession(it, false)
+                }
+                .then(Commands.literal("--refill")
+                    .executes {
+                        handleTeminateSession(it, true)
+                    }
+                )
             )
             .build()
     }
@@ -97,7 +104,7 @@ class SessionSubCommand @Inject constructor(
         return Command.SINGLE_SUCCESS
     }
 
-    private fun handleTeminateSession(ctx: CommandContext<CommandSourceStack>): Int {
+    private fun handleTeminateSession(ctx: CommandContext<CommandSourceStack>, needRefill: Boolean): Int {
         val player = ctx.source.sender as Player
         val language = commonConfigLoader.getLanguageConfig()
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
@@ -131,12 +138,13 @@ class SessionSubCommand @Inject constructor(
             Placeholder.unparsed("stage", stage.toString())
         ))
 
-        applySessionResult(result, player, language)
+        applySessionResult(result, needRefill, player, language)
         return Command.SINGLE_SUCCESS
     }
 
     private fun applySessionResult(
-        result: MineSessionResult, player: Player, language: LanguageConfig
+        result: MineSessionResult, needRefill: Boolean,
+        player: Player, language: LanguageConfig
     ) {
         val mine: Mine = result.mine
         minesConfigLoader.saveTemplate(mine.key().value(), mine.getTemplate())
@@ -151,5 +159,6 @@ class SessionSubCommand @Inject constructor(
         }
 
         mineService.register(mine)
+        if (needRefill) mine.refill()
     }
 }
