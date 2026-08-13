@@ -58,6 +58,10 @@ interface CommandModule {
 
     @Binds
     @IntoSet
+    fun bindSetRefillLocation(command: SetRefillLocationSubCommand): SubCommand
+
+    @Binds
+    @IntoSet
     fun bindTeleportCommand(command: TeleportSubCommand): SubCommand
 
 }
