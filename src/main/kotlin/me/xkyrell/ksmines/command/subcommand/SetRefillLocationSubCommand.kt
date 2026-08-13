@@ -10,6 +10,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolve
 import me.xkyrell.ksmines.MinesConstants
 import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.mine.service.MineSessionResolver
+import me.xkyrell.ksmines.util.formatted
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -54,25 +55,27 @@ class SetRefillLocationSubCommand @Inject constructor(
         val language = loader.getLanguageConfig()
 
         if (!player.hasPermission(MinesConstants.ADMIN_PERMISSION)) {
-            player.sendMessage(
-                language.noPermission.asComponent(
-                    Placeholder.component("prefix", language.prefix)
-                )
-            )
+            player.sendMessage(language.noPermission.asComponent(
+                Placeholder.component("prefix", language.prefix)
+            ))
             return Command.SINGLE_SUCCESS
         }
 
         val session = sessionResolver.resolveSession(player)
         if (session == null) {
-            player.sendMessage(
-                language.session.noActiveSession.asComponent(
-                    Placeholder.component("prefix", language.prefix)
-                )
-            )
+            player.sendMessage(language.session.noActiveSession.asComponent(
+                Placeholder.component("prefix", language.prefix)
+            ))
             return Command.SINGLE_SUCCESS
         }
 
-        session.setRefillLocation(locationProvider())
+        val location = locationProvider()
+        session.setRefillLocation(location)
+        player.sendMessage(language.session.refillLocationSet.asComponent(
+            Placeholder.component("prefix", language.prefix),
+            Placeholder.unparsed("location", location.formatted())
+        ))
+
         return Command.SINGLE_SUCCESS
     }
 }

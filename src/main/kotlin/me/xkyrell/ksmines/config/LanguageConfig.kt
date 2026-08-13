@@ -108,6 +108,9 @@ data class SessionSection(
     @Contextual val regionMaxPointSet: LocaleComponent = LocaleComponent(
         "<prefix><green>Максимальная точка региона установлена: <white><location></white>"
     ),
+    @Contextual val refillLocationSet: LocaleComponent = LocaleComponent(
+        "<prefix><green>Точка телепортации при перезаполении шахты установлена: <white><location></white>"
+    ),
     @Contextual val blockAdded: LocaleComponent = LocaleComponent(
         "<prefix><green>Блок <white><material></white> добавлен в шахту."
     ),
