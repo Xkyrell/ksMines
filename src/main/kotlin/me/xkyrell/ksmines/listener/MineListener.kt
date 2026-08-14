@@ -1,9 +1,11 @@
 package me.xkyrell.ksmines.listener
 
+import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.config.MinesConfigLoader
 import me.xkyrell.ksmines.hook.PlaceholderApiHook
-import me.xkyrell.ksmines.mine.MineImpl
+import me.xkyrell.ksmines.mine.MineFactory
 import me.xkyrell.ksmines.mine.block.responsible.DropResponsible
+import me.xkyrell.ksmines.mine.event.MineRegionOperationEvent
 import me.xkyrell.ksmines.mine.service.MineService
 import me.xkyrell.ksmines.mine.service.MineSessionService
 import net.kyori.adventure.key.Key
@@ -17,12 +19,27 @@ import org.bukkit.plugin.Plugin
 import javax.inject.Inject
 
 class MineListener @Inject constructor(
+    private val mineFactory: MineFactory,
     private val sessionService: MineSessionService,
     private val mineService: MineService,
-    private val loader: MinesConfigLoader,
+    private val commonConfigLoader: CommonConfigLoader,
+    private val minesConfigLoader: MinesConfigLoader,
     private val hook: PlaceholderApiHook,
     private val plugin: Plugin
 ) : Listener {
+
+    @EventHandler
+    fun onRegionOperation(event: MineRegionOperationEvent) {
+        val refillLocation = event.mine.getTemplate().refillLocation ?: return
+        val title = commonConfigLoader.getLanguageConfig().refillTeleport
+        event.nearbyPlayers.forEach { player ->
+            player.scheduler.run(plugin, {
+                player.teleportAsync(refillLocation)
+            }, null)
+
+            title.sendTitle(player)
+        }
+    }
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
@@ -49,11 +66,11 @@ class MineListener @Inject constructor(
     fun onEnablePlugin(event: PluginEnableEvent) {
         if (plugin != event.plugin) return
 
-        loader.getLoadedTemplates()
+        minesConfigLoader.getLoadedTemplates()
             .mapNotNull { (name, template) ->
                 val region = template.region ?: return@mapNotNull null
                 val namespace = region.minPoint.world.name
-                MineImpl(Key.key(namespace, name), template)
+                mineFactory.createMine(Key.key(namespace, name), template)
             }
             .forEach(mineService::register)
 
@@ -64,7 +81,7 @@ class MineListener @Inject constructor(
     fun onDisablePlugin(event: PluginDisableEvent) {
         if (plugin == event.plugin) {
             sessionService.unregisterAll()
-            mineService.unregisterAll(true)
+            mineService.unregisterAll()
             hook.unregister()
         }
     }

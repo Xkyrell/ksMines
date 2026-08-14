@@ -1,5 +1,6 @@
 package me.xkyrell.ksmines
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.mine.Mine
 import me.xkyrell.ksmines.mine.service.MineResolver
@@ -8,7 +9,6 @@ import me.xkyrell.ksmines.util.locale.LocaleBiListRenderer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.plugin.Plugin
-import org.bukkit.scheduler.BukkitTask
 import javax.inject.Inject
 
 class MineTask @Inject constructor (
@@ -17,19 +17,19 @@ class MineTask @Inject constructor (
     private val resolver: MineResolver
 ) {
 
-    private var task: BukkitTask? = null
+    private var task: ScheduledTask? = null
 
     fun start() {
         check(task == null) {
             "task is already started"
         }
 
-        task = plugin.server.scheduler.runTaskTimer(plugin, Runnable {
+        task = plugin.server.globalRegionScheduler.runAtFixedRate(plugin, { _ ->
             resolver.getActiveMines().forEach { mine ->
-                    val observable = mine as? Observable ?: return@forEach
-                    handleMine(mine, observable.onObserve())
-                }
-            }, 20L, 20L)
+                val observable = mine as? Observable ?: return@forEach
+                handleMine(mine, observable.onObserve())
+            }
+        }, 20L, 20L)
     }
 
     private fun handleMine(mine: Mine, result: Observable.Result) {

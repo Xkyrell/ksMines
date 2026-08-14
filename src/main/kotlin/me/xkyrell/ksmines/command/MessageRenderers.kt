@@ -4,7 +4,6 @@ import me.xkyrell.ksmines.config.LanguageConfig
 import me.xkyrell.ksmines.mine.Mine
 import me.xkyrell.ksmines.util.formatted
 import me.xkyrell.ksmines.util.locale.LocaleBiListRenderer
-import me.xkyrell.ksmines.util.locale.LocaleBiRenderer
 import me.xkyrell.ksmines.util.locale.LocaleTriRenderer
 import me.xkyrell.ksmines.util.locale.TagResolvers
 import net.kyori.adventure.text.ComponentLike
