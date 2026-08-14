@@ -6,12 +6,12 @@ enum class MineBlockProcessorStrategy {
 
     INSTANT {
         override fun compose(plugin: Plugin): MineBlockProcessor {
-            return null
+            return InstantBlockProcessor(plugin)
         }
     },
     QUEUE {
         override fun compose(plugin: Plugin): MineBlockProcessor {
-            return null
+            return QueueBlockProcessor(plugin)
         }
     };
 
