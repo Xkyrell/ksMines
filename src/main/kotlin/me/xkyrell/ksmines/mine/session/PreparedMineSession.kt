@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-internal abstract class AbstractMineSession(
+internal open class PreparedMineSession(
     private val key: NamespacedKey,
     private val owner: Player,
     private val targetIdentity: Key,
@@ -129,6 +129,8 @@ internal abstract class AbstractMineSession(
         return modifiedBlocks.toSet()
     }
 
+    override fun getTarget(): Mine? = null
+
     override fun isClosed(): Boolean = closed
 
     override fun isSessionItem(item: ItemStack): Boolean {
@@ -145,7 +147,8 @@ internal abstract class AbstractMineSession(
             val modifiedTemplate = createModifiedTemplate()
             val noChanges = modifiedTemplate == template
             return MineSessionResult(
-                createMine(modifiedTemplate),
+                targetIdentity,
+                modifiedTemplate,
                 noChanges,
                 editedStage
             )
@@ -189,7 +192,4 @@ internal abstract class AbstractMineSession(
         inventorySnapshot.restore(owner)
         modifiedBlocks.clear()
     }
-
-    protected abstract fun createMine(template: MineTemplate): Mine
-
 }

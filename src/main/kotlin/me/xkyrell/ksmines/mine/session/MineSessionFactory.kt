@@ -19,9 +19,9 @@ class MineSessionFactory @Inject constructor(
         owner: Player, targetIdentity: Key, template: MineTemplate, editedStage: Int
     ): MineSession {
         val editorItem = loader.getGeneralConfig().editorItem
-        return CreationMineSession(
-            createSessionKey(targetIdentity), owner, targetIdentity,
-            template, editorItem.compose(), editedStage
+        return PreparedMineSession(createSessionKey(targetIdentity),
+            owner, targetIdentity, template, editorItem.compose(),
+            editedStage, null, null
         )
     }
 
