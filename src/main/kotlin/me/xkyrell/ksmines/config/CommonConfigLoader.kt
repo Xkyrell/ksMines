@@ -1,10 +1,14 @@
 package me.xkyrell.ksmines.config
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
+import com.charleskorn.kaml.YamlNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
 import me.xkyrell.ksmines.config.serializer.LocaleComponentSerializer
 import me.xkyrell.ksmines.config.serializer.MaterialSerializer
+import me.xkyrell.ksmines.config.serializer.TemporalSerializer
 import me.xkyrell.ksmines.util.locale.LocaleComponent
+import me.xkyrell.temporal.Temporal
 import org.bukkit.Material
 import java.nio.file.Files
 import java.nio.file.Path
@@ -14,10 +18,15 @@ class CommonConfigLoader @Inject constructor(
     dataFolder: Path
 ) : AbstractConfigLoader(dataFolder) {
 
-    override val yaml = Yaml(serializersModule = SerializersModule {
+    override val yaml = Yaml(
+        serializersModule = SerializersModule {
             contextual(Material::class, MaterialSerializer())
+            contextual(Temporal::class, TemporalSerializer())
             contextual(LocaleComponent::class, LocaleComponentSerializer())
-        }
+        },
+        configuration = YamlConfiguration(
+            yamlNamingStrategy = YamlNamingStrategy.KebabCase
+        )
     )
 
     private lateinit var general: GeneralConfig

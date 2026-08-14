@@ -1,6 +1,8 @@
 package me.xkyrell.ksmines.config
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
+import com.charleskorn.kaml.YamlNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
 import me.xkyrell.ksmines.config.serializer.*
 import me.xkyrell.ksmines.mine.MineTemplate
@@ -27,7 +29,10 @@ class MinesConfigLoader @Inject constructor(
             contextual(ItemStack::class, ItemStackSerializer())
             contextual(Location::class, LocationSerializer())
             contextual(Temporal::class, TemporalSerializer())
-        }
+        },
+        configuration = YamlConfiguration(
+            yamlNamingStrategy = YamlNamingStrategy.KebabCase
+        )
     )
 
     private val minesDirectory: Path = dataFolder.resolve("templates")
