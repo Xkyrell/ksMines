@@ -4,13 +4,12 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.block.Block
 
 @Serializable
 class Cuboid(
     @Contextual val minPoint: Location,
     @Contextual val maxPoint: Location
-) : Iterable<Block> {
+) : Iterable<ChunkPosition> {
 
     init {
         requireNotNull(minPoint.world) {
@@ -38,8 +37,7 @@ class Cuboid(
         }
     }
 
-    private val world: World
-        get() = minPoint.world!!
+    val world: World get() = minPoint.world!!
 
     fun contains(location: Location): Boolean =
         location.world == world &&
@@ -74,14 +72,9 @@ class Cuboid(
     fun getSize(): Int =
         getSizeX() * getSizeY() * getSizeZ()
 
-    override fun iterator(): Iterator<Block> =
-        CuboidIterator(
-            world,
-            minPoint,
-            getSizeX(),
-            getSizeY(),
-            getSizeZ()
-        )
+    override fun iterator(): Iterator<ChunkPosition> {
+        return CuboidIterator(minPoint, maxPoint)
+    }
 
     companion object {
 
@@ -111,39 +104,27 @@ class Cuboid(
     }
 
     private class CuboidIterator(
-        private val world: World,
         min: Location,
-        private val sizeX: Int,
-        private val sizeY: Int,
-        private val sizeZ: Int
-    ) : Iterator<Block> {
+        max: Location
+    ) : Iterator<ChunkPosition> {
 
-        private val baseX = min.blockX
-        private val baseY = min.blockY
-        private val baseZ = min.blockZ
-        private val totalSize = sizeX * sizeY * sizeZ
-
+        private val baseX = min.blockX shr 4
+        private val baseZ = min.blockZ shr 4
+        private val chunkSizeX = (max.blockX shr 4) - baseX + 1
+        private val chunkSizeZ = (max.blockZ shr 4) - baseZ + 1
+        private val totalSize = chunkSizeX * chunkSizeZ
         private var index = 0
 
-        override fun hasNext(): Boolean =
-            index < totalSize
+        override fun hasNext(): Boolean = index < totalSize
 
-        override fun next(): Block {
-            if (!hasNext()) {
-                throw NoSuchElementException()
-            }
+        override fun next(): ChunkPosition {
+            if (!hasNext()) throw NoSuchElementException()
 
-            val x = index % sizeX
-            val y = index / sizeX % sizeY
-            val z = index / (sizeX * sizeY)
+            val x = index % chunkSizeX
+            val z = index / chunkSizeX
 
             index++
-
-            return world.getBlockAt(
-                baseX + x,
-                baseY + y,
-                baseZ + z
-            )
+            return ChunkPosition(baseX + x, baseZ + z)
         }
     }
 }
