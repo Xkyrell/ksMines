@@ -1,5 +1,6 @@
 package me.xkyrell.ksmines.mine
 
+import me.xkyrell.ksmines.mine.block.MineBlockProcessor
 import me.xkyrell.temporal.Temporal
 import net.kyori.adventure.key.Keyed
 
@@ -10,6 +11,8 @@ interface Mine : Keyed {
     fun rotate()
 
     fun getTemplate(): MineTemplate
+
+    fun getProcessor() : MineBlockProcessor
 
     fun getCurrentStage(): MineStage
 

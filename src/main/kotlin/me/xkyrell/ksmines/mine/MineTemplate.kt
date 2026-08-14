@@ -2,6 +2,7 @@ package me.xkyrell.ksmines.mine
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import me.xkyrell.ksmines.mine.block.MineBlockProcessorStrategy
 import me.xkyrell.ksmines.util.Cuboid
 import me.xkyrell.temporal.Temporal
 import org.bukkit.Location
@@ -11,6 +12,7 @@ data class MineTemplate(
     @Contextual val stageTime: Temporal,
     val teleportPlayersOnRefill: Boolean,
     val rotationStrategy: MineRotationStrategy,
+    val processorStrategy: MineBlockProcessorStrategy,
     val rotationStages: List<MineStage>,
     val region: Cuboid?,
     @Contextual val refillLocation: Location?
