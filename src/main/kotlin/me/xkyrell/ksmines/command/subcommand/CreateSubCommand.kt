@@ -81,21 +81,27 @@ class CreateSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        createMineSession(player, key.asString(), trustedTemplate, language);
+        if (!tryCreateMineSession(player, key, trustedTemplate, language)) {
+            player.sendMessage(language.invalidMine.asComponent(
+                Placeholder.component("prefix", language.prefix),
+                Placeholder.unparsed("mine", key.asString())
+            ))
+        }
         return Command.SINGLE_SUCCESS
     }
 
-    private fun createMineSession(
-        player: Player, key: String, template: MineTemplate, language: LanguageConfig
-    ) {
-        val targetIdentity: Key = Key.key(player.world.name, key)
-        val session = sessionFactory.createSession(
-            player, targetIdentity, template, 0
-        )
+    private fun tryCreateMineSession(
+        player: Player, key: Key, template: MineTemplate, language: LanguageConfig
+    ) : Boolean {
+        if (key.namespace() != player.world.name) {
+            return false
+        }
 
+        val session = sessionFactory.createSession(player, key, template, 0)
         sessionService.register(session)
         player.sendMessage(language.session.started.asComponent(
                 Placeholder.component("prefix", language.prefix)
         ))
+        return true
     }
 }

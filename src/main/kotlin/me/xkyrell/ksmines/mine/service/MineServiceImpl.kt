@@ -23,9 +23,8 @@ class MineServiceImpl @Inject constructor() : MineService {
         mines.remove(key)?.also {
             it.setActive(false)
             if (cleanUp) {
-                it.getTemplate().getRegionOrThrow().forEach {
-                    block -> block.type = Material.AIR
-                }
+                val region = it.getTemplate().getRegionOrThrow()
+                it.getProcessor().depopulate(region)
             }
         }
     }
@@ -36,9 +35,8 @@ class MineServiceImpl @Inject constructor() : MineService {
             val mine = iterator.next()
             mine.setActive(false)
             if (cleanUp) {
-                mine.getTemplate().getRegionOrThrow().forEach {
-                        block -> block.type = Material.AIR
-                }
+                val region = mine.getTemplate().getRegionOrThrow()
+                mine.getProcessor().depopulate(region)
             }
 
             iterator.remove()

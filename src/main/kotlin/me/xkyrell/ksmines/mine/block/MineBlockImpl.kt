@@ -34,8 +34,9 @@ internal class MineBlockImpl(
         event.expToDrop = 0
 
         val drop = weightedDrops.getRandomItem()
+        val location = event.block.location.clone()
         event.block.world.dropItemNaturally(
-            event.block.location,
+            location.add(0.0, 0.25, 0.0),
             drop.item.clone()
         )
     }

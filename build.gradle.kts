@@ -61,4 +61,5 @@ bukkit {
     main = "me.xkyrell.ksmines.MinesPlugin"
     apiVersion = "1.21"
     softDepend = listOf("PlaceholderAPI")
+    foliaSupported = true
 }

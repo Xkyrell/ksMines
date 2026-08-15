@@ -2,6 +2,7 @@ package me.xkyrell.ksmines.config
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Contextual
+import me.xkyrell.ksmines.config.section.TitleSection
 import me.xkyrell.ksmines.util.locale.LocaleComponent
 import me.xkyrell.ksmines.util.TemporalStyles
 import me.xkyrell.temporal.TemporalUnit
@@ -25,6 +26,10 @@ data class LanguageConfig(
     ),
     @Contextual val mineNotFound: LocaleComponent = LocaleComponent(
         "<prefix><red>Шахта <white><mine></white> не найдена."
+    ),
+    @Contextual val invalidMine: LocaleComponent = LocaleComponent(
+        "<prefix><red>Невозможно создать шахту с таким именем, используйте "
+                + "формат: <white><world></white>:<white><name><white/>.</red>"
     ),
     @Contextual val mineAlreadyExists: LocaleComponent = LocaleComponent(
         "<prefix><red>Шахта <white><mine></white> уже существует."
@@ -53,7 +58,11 @@ data class LanguageConfig(
     val mineList: MineListSection = MineListSection(),
     val session: SessionSection = SessionSection(),
     val timeFormat: TemporalRegistrySection = TemporalRegistrySection(),
-    val help: HelpSection = HelpSection()
+    val help: HelpSection = HelpSection(),
+    val refillTeleport: TitleSection = TitleSection(
+        title = LocaleComponent(" "),
+        subtitle = LocaleComponent("<green>Новые ресурсы уже здесь!")
+    )
 ) {
 
     val temporalStyle: TextualTemporalStyle by lazy {

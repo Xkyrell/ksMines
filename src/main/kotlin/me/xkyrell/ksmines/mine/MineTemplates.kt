@@ -4,6 +4,7 @@ import me.xkyrell.ksmines.util.locale.LocaleComponent
 import me.xkyrell.ksmines.config.section.SoundSection
 import me.xkyrell.ksmines.mine.block.MineBlockDrop
 import me.xkyrell.ksmines.mine.block.MineBlockImpl
+import me.xkyrell.ksmines.mine.block.MineBlockProcessorStrategy
 import me.xkyrell.temporal.Temporal
 import me.xkyrell.temporal.TemporalUnit
 import org.bukkit.Material
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack
             ),
             teleportPlayersOnRefill = false,
             rotationStrategy = MineRotationStrategy.SEQUENTIAL,
+            processorStrategy = MineBlockProcessorStrategy.INSTANT,
             rotationStages = listOf(
                 MineStage(
                     displayName = LocaleComponent("<green>Этап 1"),

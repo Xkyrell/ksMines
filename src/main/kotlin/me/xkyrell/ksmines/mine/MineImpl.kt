@@ -1,6 +1,8 @@
 package me.xkyrell.ksmines.mine
 
 import me.xkyrell.ksmines.mine.block.MineBlock
+import me.xkyrell.ksmines.mine.block.MineBlockProcessor
+import me.xkyrell.ksmines.mine.event.MineRegionOperationEvent
 import me.xkyrell.ksmines.util.*
 import me.xkyrell.ksmines.util.random.WeightSet
 import me.xkyrell.temporal.Temporal
@@ -9,7 +11,8 @@ import net.kyori.adventure.key.Key
 
 internal class MineImpl(
     private val key: Key,
-    private val template: MineTemplate
+    private val template: MineTemplate,
+    private val processor: MineBlockProcessor
 ) : Mine, Observable {
 
     private var currentStage: MineStage
@@ -61,18 +64,23 @@ internal class MineImpl(
             "region is not configured"
         }
 
-        for (block in template.region) {
-            block.setType(currentBlocks.getRandomItem().getMaterial(), false)
+        val nearbyPlayers =
+            if (template.refillLocation == null) { emptySet() }
+            else template.region.world.players
+                .filter { template.region.contains(it.location) }
+                .toSet()
+
+        val event = MineRegionOperationEvent(this, nearbyPlayers)
+        if (event.callEvent()) refillSilently()
+    }
+
+    override fun refillSilently() {
+        requireNotNull(template.region) {
+            "region is not configured"
         }
 
         remainingRefillTime = currentStage.refillTime.clone()
-        if (template.teleportPlayersOnRefill && template.refillLocation != null) {
-            for (player in template.refillLocation.world.players) {
-                if (template.region.contains(player.location)) {
-                    player.teleport(template.refillLocation)
-                }
-            }
-        }
+        processor.populate(template.region, currentBlocks)
     }
 
     override fun rotate() {
@@ -95,6 +103,8 @@ internal class MineImpl(
     override fun key(): Key = key
 
     override fun getTemplate(): MineTemplate = template
+
+    override fun getProcessor(): MineBlockProcessor = processor
 
     override fun getCurrentStage(): MineStage = currentStage
 

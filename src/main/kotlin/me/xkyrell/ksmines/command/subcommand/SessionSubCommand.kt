@@ -13,6 +13,7 @@ import me.xkyrell.ksmines.config.CommonConfigLoader
 import me.xkyrell.ksmines.config.LanguageConfig
 import me.xkyrell.ksmines.config.MinesConfigLoader
 import me.xkyrell.ksmines.mine.Mine
+import me.xkyrell.ksmines.mine.MineFactory
 import me.xkyrell.ksmines.mine.service.MineService
 import me.xkyrell.ksmines.mine.service.MineSessionService
 import me.xkyrell.ksmines.mine.session.MineSessionFactory
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class SessionSubCommand @Inject constructor(
     private val commonConfigLoader: CommonConfigLoader,
     private val minesConfigLoader: MinesConfigLoader,
+    private val mineFactory: MineFactory,
     private val mineService: MineService,
     private val sessionService: MineSessionService,
     private val sessionFactory: MineSessionFactory
@@ -66,7 +68,16 @@ class SessionSubCommand @Inject constructor(
         }
 
         val key = ctx.getArgument("key", Key::class.java)
-        val stage = IntegerArgumentType.getInteger(ctx, "stage")
+        val mine = mineService.getResolver().resolve(key)
+        if (mine == null) {
+            player.sendMessage(language.mineNotFound.asComponent(
+                Placeholder.component("prefix", language.prefix),
+                Placeholder.unparsed("mine", key.asString())
+            ))
+
+            return Command.SINGLE_SUCCESS
+        }
+
         if (sessionService.getResolver().resolveSession(player) != null) {
             player.sendMessage(language.session.alreadyInSession.asComponent(
                 Placeholder.component("prefix", language.prefix)
@@ -75,16 +86,7 @@ class SessionSubCommand @Inject constructor(
             return Command.SINGLE_SUCCESS
         }
 
-        val mine = mineService.getResolver().resolve(key)
-        if (mine == null) {
-            player.sendMessage(language.session.alreadyInSession.asComponent(
-                Placeholder.component("prefix", language.prefix),
-                Placeholder.unparsed("mine", key.asString())
-            ))
-
-            return Command.SINGLE_SUCCESS
-        }
-
+        val stage = IntegerArgumentType.getInteger(ctx, "stage")
         val stageIndex = stage - 1
         if (stageIndex !in mine.getTemplate().rotationStages.indices) {
             player.sendMessage(language.session.invalidStage.asComponent(
@@ -146,7 +148,7 @@ class SessionSubCommand @Inject constructor(
         result: MineSessionResult, needRefill: Boolean,
         player: Player, language: LanguageConfig
     ) {
-        val mine: Mine = result.mine
+        val mine: Mine = mineFactory.createMine(result.targetIdentity, result.modifiedTemplate)
         minesConfigLoader.saveTemplate(mine.key().value(), mine.getTemplate())
         if (mineService.getResolver().resolve(mine.key()) == null) {
             player.sendMessage(language.mineCreated.asComponent(

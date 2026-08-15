@@ -1,9 +1,11 @@
 package me.xkyrell.ksmines.mine.session
 
-import me.xkyrell.ksmines.mine.Mine
+import me.xkyrell.ksmines.mine.MineTemplate
+import net.kyori.adventure.key.Key
 
 data class MineSessionResult(
-    val mine: Mine,
+    val targetIdentity: Key,
+    val modifiedTemplate: MineTemplate,
     val noChanges: Boolean,
     val editedStage: Int
 )
