@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.server.PluginDisableEvent
 import org.bukkit.event.server.PluginEnableEvent
 import org.bukkit.plugin.Plugin
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MineListener @Inject constructor(
@@ -72,7 +73,12 @@ class MineListener @Inject constructor(
                 val namespace = region.minPoint.world.name
                 mineFactory.createMine(Key.key(namespace, name), template)
             }
-            .forEach(mineService::register)
+            .forEach { mine ->
+                mineService.register(mine)
+                plugin.server.asyncScheduler.runDelayed(plugin, {
+                    mine.refillSilently()
+                }, 1L, TimeUnit.SECONDS)
+            }
 
         hook.register()
     }

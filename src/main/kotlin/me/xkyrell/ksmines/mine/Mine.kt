@@ -8,6 +8,8 @@ interface Mine : Keyed {
 
     fun refill()
 
+    fun refillSilently()
+
     fun rotate()
 
     fun getTemplate(): MineTemplate

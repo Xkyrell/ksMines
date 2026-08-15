@@ -71,7 +71,13 @@ internal class MineImpl(
                 .toSet()
 
         val event = MineRegionOperationEvent(this, nearbyPlayers)
-        if (!event.callEvent()) return
+        if (event.callEvent()) refillSilently()
+    }
+
+    override fun refillSilently() {
+        requireNotNull(template.region) {
+            "region is not configured"
+        }
 
         remainingRefillTime = currentStage.refillTime.clone()
         processor.populate(template.region, currentBlocks)
